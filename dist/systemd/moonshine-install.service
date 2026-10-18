@@ -1,0 +1,20 @@
+[Unit]
+Description=Установка Moonshine по параметрам ядра
+ConditionKernelCommandLine=|moonshine.config
+ConditionKernelCommandLine=|moonshine.wizard
+Wants=network-online.target
+After=network-online.target systemd-udevd.service
+Before=getty@tty1.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/moonshine-install/moonshine-run
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+#!ipxe
+# Сетевая установка: ядро и initramfs отдаёт веб-сервер.
+kernel http://evillin.online/vmlinuz moonshine.config=http://evillin.online/moonshine.toml moonshine.yes=1 ip=dhcp
+initrd http://evillin.online/moonshine-installer.img
+boot

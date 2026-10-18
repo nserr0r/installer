@@ -1,0 +1,54 @@
+---
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  BINARY: moonshine-install
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Package
+        run: |
+          tar -C target/release -czf "$BINARY-linux-x86_64.tar.gz" "$BINARY"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(cargo metadata --no-deps --format-version 1 |
+            jq -er --arg name "$BINARY" \
+              '.packages[] | select(.name == $name) | .version')
+          TAG="v$VERSION"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$BINARY-linux-x86_64.tar.gz" --clobber
+          else
+            gh release create "$TAG" "$BINARY-linux-x86_64.tar.gz" \
+              --target "$GITHUB_SHA" \
+              --title "$TAG" \
+              --generate-notes
+          fi

@@ -1,0 +1,28 @@
+# Пример конфига: один диск, шифрование корня ключ-файлом, свои репозитории с приоритетами.
+disk     = "/dev/sda"
+hostname = "moonshine"
+timezone = "Europe/Moscow"
+firmware = "hybrid"
+
+keyfile  = true                     # ключ корня лежит в initramfs, пароль не нужен
+repo     = ["updates"]              # репозиторий хоста из /etc/yum.repos.d
+repo_priority = ["updates=20"]      # его приоритет (только на время установки)
+package  = ["vim-enhanced", "htop"]
+option   = ["releasever=9"]
+
+[[repository]]
+id       = "baseos"
+name     = "BaseOS"
+baseurl  = "https://mirror.evillin.online/9/BaseOS/$basearch/os/"
+priority = 10
+gpgkey   = "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-example"
+
+[[repository]]
+id       = "company"
+baseurl  = "https://rpm.evillin.online/company/$basearch/"
+priority = 5
+gpgcheck = false
+
+[[users]]
+name = "alice"
+hash = "$6$salt$replace-with-real-hash"
